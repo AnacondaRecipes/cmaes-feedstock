@@ -1,5 +1,5 @@
 {% set name = "cmaes" %}
-{% set version = "0.9.1" %}
+{% set version = "0.11.1" %}
 
 package:
   name: {{ name|lower }}
@@ -7,30 +7,36 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: d122f8d46377f643a150c85ffc81c4e33909a34cfdcb522ee7a6fb17ea4f232c
+  sha256: cf71fa3679814723be771f2c9edd85f465b1bc1e409e1ad6d8a9e481efcd5160
 
 build:
   number: 0
-  skip: true  # [py<37]
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: true  # [py<37]
 
 requirements:
   host:
     - pip
     - python
-    - setuptools
+    - setuptools >=61
     - wheel
   run:
     - python
     - numpy
 
 test:
+  source_files:
+    - tests
   imports:
     - cmaes
-  requires:
-    - pip
   commands:
     - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v tests
+  requires:
+    - pip
+    - pytest
+    - hypothesis
 
 about:
   home: https://github.com/CyberAgentAILab/cmaes
