@@ -1,31 +1,27 @@
 {% set name = "cmaes" %}
-{% set version = "0.11.1" %}
+{% set version = "0.12.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: cf71fa3679814723be771f2c9edd85f465b1bc1e409e1ad6d8a9e481efcd5160
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 6aab41eee2f38bf917560a7e7d1ba0060632cd44cdf7ac2a10704da994624182
 
 build:
   number: 0
+  skip: true  # [py<38]
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-  skip: true  # [py<37]
 
 requirements:
   host:
     - pip
     - python
     - setuptools >=61
-    - wheel
   run:
     - python
     - numpy
-
-# raise DeadlineExceeded -> exceeds the deadline of 200.00ms
-{% set deselect_tests = " --deselect=tests/test_fuzzing.py::TestFuzzing::test_cma_tell" %}
 
 test:
   source_files:
@@ -35,7 +31,7 @@ test:
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -v {{ deselect_tests }} tests
+    - pytest -v tests
   requires:
     - pip
     - pytest
